@@ -90,12 +90,16 @@ def create_entry():
 def summary():
 	totalIngredients = {}
 	cookTime = 0
+	invalid = False
 
 	def rec(name, quantity):
-		if name not in cookbook:
-			return "", 400
 		nonlocal cookTime
 		nonlocal totalIngredients
+		nonlocal invalid
+		if name not in cookbook or invalid:
+			invalid = True
+			return
+
 		if isinstance(cookbook[name], Ingredient):
 			cookTime += cookbook[name].cook_time * quantity
 			if name in totalIngredients:
@@ -113,6 +117,9 @@ def summary():
 		return "", 400
 
 	rec(name, 1)
+
+	if invalid:
+		return "", 400
 
 	return jsonify({
 		"name": name,
